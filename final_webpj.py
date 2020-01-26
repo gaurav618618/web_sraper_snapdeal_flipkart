@@ -2,18 +2,18 @@
 # coding: utf-8
 import requests as req,re
 from bs4 import BeautifulSoup
-url=input("Enter the product name:")
-snap=req.get("https://m.snapdeal.com/search?keyword="+url+"&categoryXPath=ALL")
-flip=req.get("https://www.flipkart.com/search?q="+url)
+item_name=input("Enter the product name:")
+snap=req.get("https://www.snapdeal.com/search?keyword="+item_name+"%20pi%204&santizedKeyword=&catId=&categoryId=0&suggested=true&vertical=&noOfResults=20&searchState=&clickSrc=suggested&lastKeyword=&prodCatId=&changeBackToAll=false&foundInAll=false&categoryIdSearched=&cityPageUrl=&categoryUrl=&url=&utmContent=&dealDetail=&sort=rlvncy")
+flip=req.get("https://www.flipkart.com/search?q="+item_name)
 key=input("Enter a keyword:" )
 law=re.compile(key,re.I)
 sb=snap.content
 fb=flip.content
 ssoup=BeautifulSoup(sb,"lxml")
 fsoup=BeautifulSoup(fb,"lxml")
-title=ssoup.find_all('div',{'class':"pdName ellip"})
-price=ssoup.find_all('div',{'class':"pdNewPrice lfloat"})
-avail=ssoup.find_all('div',{'class':"thumbnail"})
+title=ssoup.find_all('p',{'class':"product-title"})
+price=ssoup.find_all('span',{'class':"lfloat product-price"})
+avail=ssoup.find_all('span',{'class':"notifyMeSpan"})
 favail=fsoup.find_all('div',{'class':"_3O0U0u"})
 if fsoup.find('a',{'class':"_2mylT6"})!=None:
     ftitle=fsoup.find_all('a',{'class':"_2mylT6"})
@@ -26,6 +26,9 @@ elif fsoup.find('div',{'class':"_3wU53n"})!=None:
     fprice=fsoup.find_all('div',{'class':"_1vC4OE _2rQ-NK"})
 else:
     print("Sorry,talk to the developer")
+
+
+
     
 titlel=[]
 pricel=[]
@@ -38,10 +41,10 @@ for i in range(len(title)):
     if ssearch!=None:
         titlel.append(title[i].get_text())
         pricel.append(price[i].get_text())
-        if avail[i].find('span',{'class':"pdStatus soldOut"})==None:
-            avail1.append("Present")
+        if len(avail)>=i:
+            avail1.append("Out of stock")
         else:
-            avail1.append("Out of stock") 
+            avail1.append("present") 
             
 for f in range(len(ftitle)):
     fsearch=law.search(ftitle[f].get_text())
